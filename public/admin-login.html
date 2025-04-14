@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Admin Login Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="flex items-center justify-center h-screen bg-gray-900 text-white">
+
+    <!-- Admin Login Button -->
+    <button onclick="openModal()" id="login-button"
+        class=" bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded transition">
+        Admin Login
+    </button>
+    <div class="flex justify-between p-5 ">
+    
+        <a href="/" id="logoutButton"
+            class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
+            Go to Home
+        </a>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="hidden fixed inset-0 bg-black bg-opacity-50  flex items-center justify-center">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-96 relative">
+            <button onclick="closeModal()"
+                class="absolute top-2 right-3 text-gray-400 hover:text-gray-200 text-xl">&times;</button>
+
+            <h2 class="text-2xl font-bold text-white text-center mb-4">Admin Login</h2>
+
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label class="block text-gray-400 mb-1">Username</label>
+                    <input type="text" id="username"
+                        class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                        required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-gray-400 mb-1">Password</label>
+                    <input type="password" id="password"
+                        class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                        required>
+                </div>
+
+                <button type="submit"
+                    class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold p-2 rounded mt-2 transition">
+                    Login
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal() {
+            document.getElementById("loginModal").classList.remove("hidden");
+        }
+
+        function closeModal() {
+            document.getElementById("loginModal").classList.add("hidden");
+        }
+
+        document.getElementById("loginForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            try {
+                const response = await fetch("/api/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include", // Ensure session cookie is included
+                    body: JSON.stringify({ username, password })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Ensure session is saved and redirect after a delay
+                    setTimeout(() => window.location.href = "/admin-dashboard", 500);
+                } else {
+                    alert("Invalid credentials, please try again.");
+                }
+            } catch (error) {
+                console.error("Error during login:", error);
+                alert("Error during login. Check console for details.");
+            }
+        });
+
+
+    </script>
+
+</body>
+
+</html>

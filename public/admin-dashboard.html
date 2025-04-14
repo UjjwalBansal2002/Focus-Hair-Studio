@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salon Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+    <!-- Sidebar -->
+    <div class="flex">
+        <aside class="w-64 h-screen bg-gray-900 text-white p-5">
+            <h2 class="text-xl font-bold">Admin Dashboard</h2>
+            
+            <nav class="mt-5">
+                <ul>
+                    <!-- <li class="mb-3"><a href="#" class="hover:text-yellow-400">Dashboard</a></li> -->
+                    <li class="mb-3"><a href="#" class="hover:text-yellow-400">Appointments</a></li>
+                    <!-- <li class="mb-3"><a href="#" class="hover:text-yellow-400">Clients</a></li>
+                    <li class="mb-3"><a href="#" class="hover:text-yellow-400">Settings</a></li> -->
+                </ul>
+                <div class="flex justify-between p-5 ">
+
+                    <a href="" id="logoutButton" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
+                        Logout
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6">
+            <h1 class="text-2xl font-bold mb-4">Dashboard</h1>
+
+            <!-- Dashboard Stats -->
+            <div class="grid grid-cols-3 gap-4 mb-6">
+                <div class="bg-white p-6 shadow-md rounded-lg text-center">
+                    <h2 class="text-xl font-bold">Total Appointments</h2>
+                    <p class="text-3xl font-bold text-yellow-500" id="totalAppointments"></p>
+                </div>
+                
+               
+
+            </div>
+            <div class="flex justify-between">
+                <div class="flex justify-between p-5 ">
+                    <button onclick="showTab('previous')" class="tab-btn bg-gray-700 text-white px-4 py-2 rounded"
+                        id="btn-previous">Previous</button>
+                </div>
+                <div class="flex justify-between p-5 ">
+                    <button onclick="showTab('today')" class="tab-btn bg-yellow-500 text-black px-4 py-2 rounded active"
+                        id="btn-today">Today</button>
+                </div>
+                <div class="flex justify-between p-5 ">
+
+                    <button onclick="showTab('upcoming')" class="tab-btn bg-gray-700 text-white px-4 py-2 rounded"
+                        id="btn-upcoming">Upcoming</button>
+                </div>
+            </div>
+
+            <!-- Appointments Table -->
+            <div id="section-today">
+                <h2 class="text-xl font-bold mb-2">Today's Appointments</h2>
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-700 text-white">
+                        <tr>
+                            <th class="p-2">Name</th>
+                            <th class="p-2">Phone</th>
+                            <th class="p-2">Priority</th>
+                            <th class="p-2">Service</th>
+                            <th class="p-2">Date</th>
+                            <th class="p-2">Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="todayTableBody" class="bg-gray-800 text-white"></tbody>
+                </table>
+            </div>
+
+            <div id="section-previous" class="hidden">
+                <h2 class="text-xl font-bold mb-2">Previous Appointments</h2>
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-700 text-white">
+                        <tr>
+                            <th class="p-2">Name</th>
+                            <th class="p-2">Phone</th>
+                            <th class="p-2">Priority</th>
+                            <th class="p-2">Service</th>
+                            <th class="p-2">Date</th>
+                            <th class="p-2">Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="previousTableBody" class="bg-gray-800 text-white"></tbody>
+                </table>
+            </div>
+
+            <div id="section-upcoming" class="hidden">
+                <h2 class="text-xl font-bold mb-2">Upcoming Appointments</h2>
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-700 text-white">
+                        <tr>
+                            <th class="p-2">Name</th>
+                            <th class="p-2">Phone</th>
+                            <th class="p-2">Priority</th>
+                            <th class="p-2">Service</th>
+                            <th class="p-2">Date</th>
+                            <th class="p-2">Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="upcomingTableBody" class="bg-gray-800 text-white"></tbody>
+                </table>
+            </div>
+
+            
+        </main>
+
+    </div>
+
+    <script>
+
+        function showTab(tab) {
+            // Hide all sections
+            document.getElementById("section-today").classList.add("hidden");
+            document.getElementById("section-previous").classList.add("hidden");
+            document.getElementById("section-upcoming").classList.add("hidden");
+
+            // Remove active from all buttons
+            document.querySelectorAll(".tab-btn").forEach(btn => {
+                btn.classList.remove("bg-yellow-500", "text-black");
+                btn.classList.add("bg-gray-700", "text-white");
+            });
+
+            // Show selected section
+            document.getElementById("section-" + tab).classList.remove("hidden");
+
+            // Highlight active button
+            document.getElementById("btn-" + tab).classList.remove("bg-gray-700", "text-white");
+            document.getElementById("btn-" + tab).classList.add("bg-yellow-500", "text-black");
+        }
+
+
+
+        // Mock data for appointments
+        async function fetchAppointments() {
+            try {
+                const response = await fetch("/api/admin/appointments", {
+                    method: "GET",
+                    credentials: "include", // Keep for session or cookie auth
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.message || "Failed to fetch appointments.");
+                }
+
+                // Update total count
+                const totalCount =
+                    data.data.today.length +
+                    data.data.previous.length +
+                    data.data.upcoming.length;
+
+                document.getElementById("totalAppointments").innerHTML = totalCount;
+
+                // Render each category into their respective tables
+                renderAppointmentsToTable("todayTableBody", data.data.today);
+                renderAppointmentsToTable("previousTableBody", data.data.previous);
+                renderAppointmentsToTable("upcomingTableBody", data.data.upcoming);
+
+            } catch (error) {
+                console.error("Error fetching appointments:", error);
+            }
+        }
+
+        function renderAppointmentsToTable(tableId, appointments) {
+            const tableBody = document.getElementById(tableId);
+            tableBody.innerHTML = "";
+            // console.log(appointments.length)
+
+            if (appointments.length === 0) {
+                const row = document.createElement("tr");
+                row.innerHTML = `<td colspan="6" class="text-center text-gray-400 p-2">No appointments found</td>`;
+                tableBody.appendChild(row);
+                return;
+            }
+
+            appointments.forEach((appointment) => {
+                const row = document.createElement("tr");
+
+                row.innerHTML = `
+            <td class="p-2 border border-gray-700">${appointment.name}</td>
+            <td class="p-2 border border-gray-700">${appointment.phone}</td>
+            <td class="p-2 border border-gray-700">${appointment.bookingType || "N/A"}</td>
+            <td class="p-2 border border-gray-700">${appointment.service}</td>
+            <td class="p-2 border border-gray-700">${new Date(appointment.date).toLocaleDateString()}</td>
+            <td class="p-2 border border-gray-700">${appointment.time}</td>
+        `;
+
+                tableBody.appendChild(row);
+            });
+        }
+
+
+
+
+
+
+
+
+
+
+
+        // ✅ Call `fetchStatuses` when the page loads
+
+
+
+
+
+
+
+
+
+
+        // Format date from "YYYY-MM-DD" to "DD/MM/YYYY"
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString("en-GB"); // Converts to "DD/MM/YYYY"
+        }
+
+        document.getElementById("logoutButton").addEventListener("click", async () => {
+            try {
+                const response = await fetch("/api/logout", {
+                    method: "POST",
+                    credentials: "include" // Ensure session cookies are handled properly
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert("Logged out successfully!");
+                    window.location.href = "/"; // Redirect to index.html after logout
+                } else {
+                    alert("Logout failed. Please try again.");
+                }
+            } catch (error) {
+                console.error("Logout error:", error);
+                alert("An error occurred during logout.");
+            }
+        });
+
+
+        // Call function when the page loads
+        document.addEventListener("DOMContentLoaded", fetchAppointments);
+
+    </script>
+
+</body>
+
+</html>
