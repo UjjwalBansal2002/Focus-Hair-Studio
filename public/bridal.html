@@ -30,7 +30,7 @@
             <button onclick="closeModal()"
                 class="absolute top-2 right-3 text-gray-400 hover:text-gray-200 text-xl">&times;</button>
 
-            <h2 class="text-2xl font-bold text-white text-center mb-4">Beard Style</h2>
+            <h2 class="text-2xl font-bold text-white text-center mb-4">Bridal Package Booking</h2>
 
 
 
@@ -129,6 +129,8 @@
             document.getElementById("appointmentModal").classList.add("hidden");
             document.getElementById("gotohome").classList.remove("hidden");
             document.getElementById("book").classList.remove("hidden");
+
+
         }
 
         // Close Confirmation Modal
@@ -147,11 +149,11 @@
             // Get form values
             const name = document.getElementById("name").value.trim();
             const phone = document.getElementById("phone").value.trim();
-            const priority = document.getElementById("priority").value;
+            const priority = document.getElementById("priority").value.trim();
             // const service = document.getElementById("service").value;
             const date = document.getElementById("date").value;
             const time = document.getElementById("time").value;
-            const service = "Beard Style"
+            const service = "Bridal Package"
 
             // Simple validation
             if (!name || !phone || !service || !date || !time || !priority) {
