@@ -11,8 +11,6 @@ const Appointment = require("./models/appointment");
 app.use(cookieParser());
 // const {jwtAuthMiddleware, generateToken} = require("./jwt")
 // const {jwtAuthMiddleware, generateToken} = require("./jwt");
-
-
 // Initialize app
 connectDB(); // Connect to MongoDB
 
